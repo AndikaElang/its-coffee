@@ -1,10 +1,10 @@
-# RSUI Website
+# IT'S Coffee
 
-RSUI Website rewrite. Made with laravel, inertiajs, react, mantine, and tailwindcss.
+IT'S Coffee. Made with laravel, inertiajs, react, mantine, and tailwindcss.
 
 ## Table of Contents
 
-- [RSUI Website](#rsui-website)
+- [IT'S Coffee](#its-coffee)
   - [Table of Contents](#table-of-contents)
   - [Production](#production)
     - [SSR](#ssr)
@@ -20,7 +20,7 @@ RSUI Website rewrite. Made with laravel, inertiajs, react, mantine, and tailwind
 
 ### Preparation
 
-See [Gitlab CI](./.gitlab-ci.yml) for more information.
+<!-- See [Gitlab CI](./.gitlab-ci.yml) for more information. -->
 
 ```sh
 php artisan optimize
@@ -93,7 +93,7 @@ php artisan key:generate
 **Update the following lines in your .env file to match your database configuration:**
 
 ```sh
-DB_CONNECTION=pgsql
+DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_DATABASE=your_database
@@ -125,10 +125,10 @@ pnpm run dev
 php artisan serve
 ```
 
-Default Admin User:
+<!-- Default Admin User:
 Email: <admin@example.com>
 Password: password
-You can log in with these credentials and start managing your application.
+You can log in with these credentials and start managing your application. -->
 
 ## Acknowledgements
 
