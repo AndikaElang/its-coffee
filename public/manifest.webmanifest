@@ -1,0 +1,66 @@
+{
+  "name": "Rumah Sakit Universitas Indonesia",
+  "short_name": "RSUI",
+  "start_url": ".",
+  "background_color": "#ffffff",
+  "description": "Website resmi Rumah Sakit Universitas Indonesia",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "purpose": "maskable",
+      "sizes": "666.6666666666666x666.6666666666666",
+      "src": "maskable_icon.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "48x48",
+      "src": "maskable_icon_x48.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "72x72",
+      "src": "maskable_icon_x72.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "96x96",
+      "src": "maskable_icon_x96.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "128x128",
+      "src": "maskable_icon_x128.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "192x192",
+      "src": "maskable_icon_x192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "384x384",
+      "src": "maskable_icon_x384.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "maskable_icon_x512.png",
+      "type": "image/png"
+    }
+  ],
+  "id": "250526",
+  "orientation": "portrait",
+  "lang": "id",
+  "dir": "ltr",
+  "categories": [
+    "health"
+  ]
+}

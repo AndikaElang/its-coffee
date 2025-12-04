@@ -1,0 +1,19 @@
+{
+  "search": "Pencarian",
+  "search.results": "Hasil Pencarian",
+  "search.keyword": "Masukkan kata kunci pencarian...",
+  "search.allResults": "Semua Hasil",
+  "search.show": "Menampilkan",
+  "search.of": "dari",
+  "search.resultsFound": "hasil ditemukan",
+  "search.previous": "Sebelumnya",
+  "search.next": "Selanjutnya",
+  "search.headerTitle.disorderDiseas": "Kelainan & Penyakit",
+  "search.headerTitle.popularArticles": "Artikel Populer",
+  "search.headerTitle.news": "Berita",
+  "search.headerTitle.visualEducations": "Edukasi Visual",
+  "search.headerTitle.activities": "Kegiatan",
+  "search.headerTitle.promotions": "Promosi",
+  "search.headerTitle.polyClinics": "Poliklinik",
+  "search.headerTitle.trainings": "Pelatihan"
+}

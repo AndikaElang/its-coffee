@@ -1,0 +1,15 @@
+{
+  "other": "Lainnya",
+  "load-more": "Muat lebih banyak data",
+  "all-loaded": "Semua data sudah dimuat",
+  "category": "Kategori",
+  "data-not-found": "Data tidak ditemukan",
+  "download": "Unduh",
+  "downloading": "Mengunduh...",
+  "no-record": "Tidak ada data untuk ditampilkan",
+  "no-record-desc": "Tidak ditemukan data pada database. Silakan coba lagi nanti.",
+  "see-more": "Selengkapnya",
+  "closed": "Ditutup",
+  "finished": "Selesai",
+  "related": "Terkait"
+}

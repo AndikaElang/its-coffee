@@ -1,0 +1,189 @@
+.footer {
+  background-color: var(--mantine-color-blue-8);
+  color: white;
+  padding: 3rem 0 0 0;
+  margin-top: auto;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.linkGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.link {
+  color: white;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: #e6e6e6;
+  text-decoration: none;
+}
+
+.socialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: white;
+  color: var(--mantine-color-blue-8);
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.socialIcon:hover {
+  background-color: #e6e6e6;
+}
+
+.tagline {
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.address {
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+.bottom {
+  background-color: #25455e;
+}
+
+.bottomLink {
+  color: white;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.divider {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.accordion {
+  margin-top: 0.5rem;
+}
+
+/* Transparent di semua state + teks putih */
+.accordion :global(.mantine-Accordion-item) {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: none !important;
+}
+
+.accordion :global(.mantine-Accordion-control) {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.accordion :global(.mantine-Accordion-control:hover),
+.accordion :global(.mantine-Accordion-control[data-active]) {
+  background: transparent !important;
+}
+
+.accordion :global(.mantine-Accordion-label) {
+  color: #fff !important;
+}
+
+/* Ikon chevron putih (Mantine v7) */
+.accordion :global(.mantine-Accordion-chevron) {
+  color: #fff !important;
+  stroke: #fff !important;
+}
+
+.accordion :global(.mantine-Accordion-content) {
+  color: #fff !important;
+  background: transparent !important;
+}
+
+/* Accordion mobile look: transparent, white text, only bottom divider */
+.accordion {
+  margin-top: 0.5rem;
+}
+
+.accordion :global(.mantine-Accordion-item) {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.accordion :global(.mantine-Accordion-item:not(:last-of-type)) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Tambah border untuk item terakhir juga */
+.accordion :global(.mantine-Accordion-item:last-of-type) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55) !important;
+}
+
+.accordion :global(.mantine-Accordion-control) {
+  background: transparent !important;
+  color: #fff !important;
+  padding: 0.75rem 0 !important; /* jarak vertikal sesuai contoh */
+}
+
+.accordion :global(.mantine-Accordion-label) {
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.accordion :global(.mantine-Accordion-chevron) {
+  color: #fff !important;
+  stroke: #fff !important;
+}
+
+.accordion :global(.mantine-Accordion-content) {
+  color: #fff !important;
+  background: transparent !important;
+  padding: 0.5rem 0 1rem 0; /* ruang konten */
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding-top: 2rem;
+    /* text-align: center; */
+  }
+
+  .title {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .link {
+    font-size: 0.875rem;
+  }
+
+  .tagline,
+  .address {
+    font-size: 0.8rem;
+  }
+
+  .bottom {
+    text-align: center;
+  }
+
+  .bottom .mantine-Group-root {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .bottomLink {
+    font-size: 0.75rem;
+  }
+
+  .divider {
+    display: none;
+  }
+}

@@ -1,0 +1,95 @@
+/* @reference "tailwindcss"; */
+
+.wrapper {
+  color: var(--mantine-color-white);
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(0, 114, 188, 0.8), rgba(0, 114, 188, 0.8)),
+    url('/assets/media/cerita-kami.png') center/cover no-repeat;
+}
+
+.link {
+  color: var(--mantine-color-white);
+  opacity: 0.8;
+  font-weight: 500;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: none;
+  }
+}
+
+/* Gaya kartu testimoni Anda yang dipertahankan */
+.testimonial {
+  position: relative;
+  padding: var(--mantine-spacing-lg);
+  background-color: var(--mantine-color-white);
+  color: var(--mantine-color-black);
+  border: 0;
+  /* Properti tambahan untuk animasi */
+  width: 400px;
+  flex-shrink: 0;
+  display: flex; /* Menggunakan flex untuk mengatur konten di dalamnya */
+  flex-direction: column;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: calc(50% - 10px);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid var(--mantine-color-white);
+  }
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--mantine-color-white);
+  margin-bottom: var(--mantine-spacing-sm);
+}
+
+@keyframes scroll {
+  to {
+    transform: translate(calc(-50% - 0.5rem));
+  }
+}
+
+.scrollerContainer {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, white 10%, white 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, white 10%, white 90%, transparent);
+}
+
+.scrollerInner {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  flex-wrap: nowrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scrollerContainer[data-animated='true'] .scrollerInner {
+  animation: scroll 80s linear infinite;
+}
+
+.scrollerContainer:hover .scrollerInner {
+  animation-play-state: paused;
+}
+
+@media (max-width: 768px) {
+  .testimonial {
+    width: 280px;
+    padding: var(--mantine-spacing-md);
+  }
+
+  .scrollerContainer[data-animated='true'] .scrollerInner {
+    animation-duration: 60s;
+  }
+}

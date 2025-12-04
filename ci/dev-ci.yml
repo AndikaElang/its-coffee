@@ -1,0 +1,26 @@
+stages:
+  - build
+
+variables:
+  NODE_ENV: production
+  GIT_STRATEGY: none
+
+build:
+  stage: build
+  tags:
+    - ci-dev
+  before_script:
+    - export NVM_DIR="/home/rsui-website-preview/.nvm" # point at nvm
+    - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' # This loads nvm
+    - nvm use 22.17.1
+  script:
+    - cd /home/rsui-website-preview/htdocs/web-preview.rs.ui.ac.id
+    - git fetch
+    - git pull
+    - /usr/bin/php8.3 /usr/local/bin/composer install
+    - pnpm install
+    - pnpm build
+    - /usr/bin/php8.3 artisan clear-compiled
+    - /usr/bin/php8.3 artisan optimize
+  only:
+    - rewrite-preview

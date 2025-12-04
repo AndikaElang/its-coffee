@@ -1,0 +1,57 @@
+.cardHover {
+  /* add animation */
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.cardHover:hover {
+  /* on hover scale size */
+  transform: scale(1.05);
+}
+
+.cardHoverSmaller {
+  /* add animation */
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.cardHoverSmaller:hover {
+  /* on hover scale size */
+  transform: scale(0.99);
+}
+
+@media (max-width: $mantine-breakpoint-xs) {
+  .titleWrapper {
+    flex-direction: column;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .subTitle {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: $mobile) {
+  .title {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: $mobile-s) {
+  .title {
+    font-size: 0.75rem;
+  }
+}
+
+.unstyledBtn,
+.unstyledBtn::after,
+.unstyledBtn::before,
+.unstyledBtn:focus,
+.unstyledBtn:hover,
+.unstyledBtn:active,
+.unstyledBtn:visited {
+  outline: none;
+}

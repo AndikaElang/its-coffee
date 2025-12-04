@@ -1,0 +1,30 @@
+@reference "tailwindcss";
+
+.header {
+  display: flex;
+  flex-direction: column;
+  @apply container mx-auto px-0;
+}
+
+.header-link {
+  display: inline-flex;
+  align-items: center;
+  color: #25455e;
+  font-weight: 500;
+  margin-bottom: auto;
+  white-space: nowrap; /* prevent text wrap */
+  flex-shrink: 0; /* prevent shrinking when text on left grows */
+
+  &:hover {
+    color: #374151;
+    text-decoration: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,14 @@
+/* auth page */
+/* breakpoint logo-auth */
+@media (max-width: $logo-auth) {
+  .authPage {
+    flex-direction: column;
+  }
+}
+
+/* footer */
+@media (max-width: $mobile) {
+  .footerHiddenInMobile {
+    display: none;
+  }
+}

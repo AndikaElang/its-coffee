@@ -1,0 +1,705 @@
+/* stylelint-disable rule-empty-line-before */
+/* stylelint-disable at-rule-empty-line-before */
+/* stylelint-disable import-notation */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* fix shadcn dialog popup making body width small */
+body[data-scroll-locked] {
+  width: 100% !important;
+}
+
+@theme {
+  --font-mono: 'Geist Mono', 'Fira Code', monospace;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  /* Original shadow-xl-all */
+  /* --shadow-xl-all:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 -20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 -10px 10px -5px rgba(0, 0, 0, 0.04), 20px 0 25px -5px rgba(0, 0, 0, 0.1), 10px 0 10px -5px rgba(0, 0, 0, 0.04),
+    -20px 0 25px -5px rgba(0, 0, 0, 0.1), -10px 0 10px -5px rgba(0, 0, 0, 0.04); */
+
+  --shadow-xl-all:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 -4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 -2px 4px -1px rgba(0, 0, 0, 0.06), 4px 0 6px -1px rgba(0, 0, 0, 0.1), 2px 0 4px -1px rgba(0, 0, 0, 0.06),
+    -4px 0 6px -1px rgba(0, 0, 0, 0.1), -2px 0 4px -1px rgba(0, 0, 0, 0.06);
+
+  /* +1 karena dia tailwindnya dia itu breakpointnya pake = */
+  --breakpoint-xs: 321px;
+  --breakpoint-laptop: 1025px;
+  --breakpoint-tablet: 767px;
+  --breakpoint-mobile: 426px;
+  --breakpoint-mobile-s: 321px;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+    --brand: #0d6efd;
+    --brand-foreground: #ffffff;
+    --accent-strong: #e95a0a;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /*
+  .shadow-xl-all {
+    @apply shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04),0_-20px_25px_-5px_rgba(0,0,0,0.1),0_-10px_10px_-5px_rgba(0,0,0,0.04),20px_0_25px_-5px_rgba(0,0,0,0.1),10px_0_10px_-5px_rgba(0,0,0,0.04),-20px_0_25px_-5px_rgba(0,0,0,0.1),-10px_0_10px_-5px_rgba(0,0,0,0.04)];
+  } */
+
+  /* Custom Scrollbar Styles */
+  .scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.708 0 0) transparent;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 100px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background: oklch(0.708 0 0 / 0.3);
+    border-radius: 100px;
+    transition: background 0.2s ease;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.708 0 0 / 0.5);
+  }
+
+  /* Dark mode scrollbar */
+  .dark .scrollbar-custom {
+    scrollbar-color: oklch(0.439 0 0) transparent;
+  }
+
+  .dark .scrollbar-custom::-webkit-scrollbar-thumb {
+    background: oklch(0.439 0 0 / 0.4);
+  }
+
+  .dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.439 0 0 / 0.6);
+  }
+}
+
+@layer components {
+  .bg-mantine-blue-8 {
+    background-color: var(--mantine-color-blue-8) !important;
+  }
+
+  .color-mantine-blue-8 {
+    color: var(--mantine-color-blue-8) !important;
+  }
+
+  .nav-menu-title {
+    @apply !font-semibold cursor-pointer;
+    color: var(--mantine-color-blue-8) !important;
+  }
+
+  .nav-menu-text {
+    @apply text-gray-500;
+    font-weight: 500;
+  }
+  .nav-menu-text:hover {
+    color: var(--mantine-color-blue-8) !important;
+  }
+
+  .hero-section {
+    /* @apply bg-gradient-to-br from-[var(--mantine-color-blue-8)] via-[var(--mantine-color-blue-6)] to-[var(--mantine-color-blue-4)]; */
+    @apply bg-[var(--mantine-color-blue-8)];
+  }
+}
+
+@layer components {
+  .rich-text-typography {
+    @apply text-gray-800 leading-relaxed;
+
+    b,
+    strong {
+      @apply font-semibold text-gray-900;
+    }
+
+    i,
+    em {
+      @apply italic text-gray-800;
+    }
+
+    u {
+      @apply underline decoration-2 underline-offset-2;
+    }
+
+    mark {
+      @apply bg-yellow-200 text-gray-900 rounded-sm px-1;
+    }
+
+    sub {
+      @apply align-sub text-xs text-gray-700;
+    }
+
+    sup {
+      @apply align-super text-xs text-gray-700;
+    }
+
+    hr {
+      @apply border-t border-gray-300 my-4;
+    }
+
+    blockquote {
+      @apply border-l-4 border-gray-300 pl-4 italic text-gray-700;
+    }
+
+    code {
+      @apply bg-gray-100 rounded px-1 py-0.5 font-mono text-sm;
+    }
+
+    pre {
+      @apply bg-gray-100 rounded-md p-3 font-mono text-sm overflow-x-auto;
+    }
+
+    h1 {
+      @apply text-3xl font-bold mt-6 mb-3;
+    }
+
+    h2 {
+      @apply text-2xl font-semibold mt-5 mb-2;
+    }
+
+    h3 {
+      @apply text-xl font-semibold mt-4 mb-2;
+    }
+
+    h4 {
+      @apply text-lg font-medium mt-3 mb-1;
+    }
+
+    a {
+      @apply text-blue-600 underline-offset-2 hover:underline hover:text-blue-800;
+    }
+
+    ol {
+      @apply list-decimal pl-6 space-y-1;
+    }
+
+    ul {
+      @apply list-disc pl-6 space-y-1;
+    }
+
+    li {
+      @apply text-gray-800;
+    }
+  }
+}
+
+@layer mantine, mantine-datatable;
+
+@theme inline {
+  --animate-line-shadow: line-shadow 15s linear infinite;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  @keyframes line-shadow {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 100% -100%;
+    }
+  }
+
+  /* expose new tokens to Tailwind class names */
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-accent-strong: var(--accent-strong);
+}
+
+:root {
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@layer utilities {
+  .animate-indeterminate-progress {
+    width: 50%;
+    animation: indeterminate 1.5s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395);
+  }
+
+  @keyframes indeterminate {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(200%);
+    }
+  }
+}
+
+/* Nav */
+.mobile-nav-sheet button.ring-offset-background svg {
+  display: none;
+}
+
+[data-slot='sheet-overlay'] {
+  display: none;
+}
+
+/* Embla carousel */
+/* For the Previous/Next buttons */
+.mantine-Carousel-control {
+  /* A semi-transparent dark gray. This provides a base level of contrast. */
+  background-color: rgba(30, 30, 30, 0.4);
+
+  /* Keep the blur effect */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  /* Add a light, inner shadow or border to "catch the light" on dark backgrounds */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+
+  /* Ensure the arrow icon is bright white */
+  color: white;
+
+  /* Make the button bigger */
+  width: 50px;
+  height: 50px;
+
+  svg {
+    width: 25px !important;
+    height: 25px !important;
+  }
+}
+
+/* For the dot/line indicators */
+.mantine-Carousel-indicator {
+  background-color: rgba(30, 30, 30, 0.4);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Add a subtle drop shadow */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  transition: width 250ms ease;
+
+  /* Make the indicator bigger */
+  width: 16px;
+  height: 6px;
+
+  &[data-active] {
+    width: 40px;
+    background-color: white;
+  }
+}
+
+/* Custom */
+.text-link {
+  color: var(--mantine-color-blue-6);
+  text-decoration: underline;
+}
+
+.hr-error {
+  width: 100%; /* Initial width */
+  height: 2px; /* Height of the line */
+  background-color: red;
+  border: none;
+  animation: hr-timer-animation 8s linear forwards;
+}
+
+.hr-warning {
+  width: 100%;
+  height: 2px;
+  background-color: var(--mantine-color-orange-8);
+  border: none;
+  animation: hr-timer-animation 6s linear forwards;
+}
+
+.hr-success {
+  width: 100%;
+  height: 2px;
+  background-color: var(--mantine-color-green-6);
+  border: none;
+  animation: hr-timer-animation 4s linear forwards;
+}
+
+.hr-info {
+  width: 100%;
+  height: 2px;
+  background-color: var(--mantine-color-cyan-6);
+  border: none;
+  animation: hr-timer-animation 5s linear forwards;
+}
+
+@keyframes hr-timer-animation {
+  0% {
+    width: 100%;
+  } /* Starting width */
+  100% {
+    width: 0;
+  } /* Ending width */
+}
+
+/* CUSTOM */
+/* center the header */
+.mantine-Modal-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--mantine-color-blue-2);
+  margin-bottom: 1rem;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 0.6s linear;
+}
+
+/* center vertical-horizontal */
+.centered-wrapper {
+  display: flex;
+  justify-content: center; /* Horizontal centering */
+  align-items: center; /* Vertical centering */
+}
+
+.centered-xy {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Custom styles for the Tiptap editor */
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+}
+
+.ProseMirror h1 {
+  @apply text-3xl font-bold;
+  @apply text-primary;
+}
+
+.ProseMirror h2 {
+  @apply text-2xl font-bold;
+  @apply text-primary;
+}
+
+.ProseMirror h3 {
+  @apply text-xl font-bold;
+  @apply text-primary;
+}
+
+.ProseMirror h4 {
+  @apply text-lg font-bold;
+  @apply text-primary;
+}
+
+/* Table styles */
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.ProseMirror th {
+  background-color: rgba(0, 0, 0, 0.05);
+  font-weight: bold;
+}
+
+.ProseMirror td,
+.ProseMirror th {
+  border: 2px solid #e2e8f0;
+  padding: 0.5rem;
+  position: relative;
+  vertical-align: top;
+}
+
+/* Selected cell */
+.ProseMirror .selectedCell:after {
+  background: rgba(200, 200, 255, 0.4);
+  content: '';
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+/* Text alignment */
+.ProseMirror [data-text-align='center'] {
+  text-align: center;
+}
+
+.ProseMirror [data-text-align='right'] {
+  text-align: right;
+}
+
+.ProseMirror [data-text-align='left'] {
+  text-align: left;
+}
+
+/* Image styles */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+  display: block;
+  margin: 1rem auto; /* Default center alignment */
+}
+
+/* Image alignment styles - Override the default margin for specific alignments */
+.ProseMirror img[data-align='left'] {
+  margin-left: 0;
+  margin-right: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ProseMirror img[data-align='center'] {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ProseMirror img[data-align='right'] {
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Selected image styles */
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Image resize handles */
+.ProseMirror img.ProseMirror-selectednode::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid #2563eb;
+  pointer-events: none;
+}
+
+/* Bubble menu active buttons */
+.ProseMirror-menubar button[data-active='true'],
+.ProseMirror-menu button[data-active='true'] {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Drag and drop highlight */
+.ProseMirror-dropCursor {
+  position: absolute;
+  pointer-events: none;
+  background-color: #2563eb;
+  width: 2px;
+}
+
+/* Sticky toolbar transition */
+.toolbar-sticky {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Toolbar shadow when sticky */
+.toolbar-sticky.is-sticky {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ProseMirror-focused {
+  outline: 0.5px solid var(--mantine-color-blue-3);
+  transition: outline 0.2s ease-in-out;
+}
+
+.prose p a {
+  margin-left: 3px;
+  margin-right: 3px;
+}

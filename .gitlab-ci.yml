@@ -1,0 +1,3 @@
+include:
+  - local: "ci/dev-ci.yml"
+  - local: "ci/prod-ci.yml"
