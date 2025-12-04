@@ -4,9 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePushNotificationMsgsTable extends Migration
-{
-  protected $connection = 'pgsqlpasien';
+return new class extends Migration {
+
   /**
    * Run the migrations.
    */
@@ -19,8 +18,7 @@ class CreatePushNotificationMsgsTable extends Migration
         $table->string('body')->nullable(false);
         $table->string('url')->nullable(false);
         $table->boolean('is_read')->default(false);
-        $table->bigInteger('user_id');
-        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        $table->foreignUuid('user_id')->references('id')->on('users')->onDelete('cascade');
         $table->timestamps();
       });
     }

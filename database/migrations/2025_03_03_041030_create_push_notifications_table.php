@@ -4,9 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePushNotificationsTable extends Migration
-{
-  protected $connection = 'pgsqlpasien';
+return new class extends Migration {
+
   /**
    * Run the migrations.
    *
@@ -21,8 +20,7 @@ class CreatePushNotificationsTable extends Migration
         $table->string('endpoint')->nullable(false);
         $table->string('key_auth')->nullable(false);
         $table->string('key_p256dh')->nullable(false);
-        $table->bigInteger('user_id');
-        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        $table->foreignUuid('user_id')->references('id')->on('users')->onDelete('cascade');
         $table->string('session_id')->nullable(false);
         $table->timestamps();
       });
@@ -38,4 +36,4 @@ class CreatePushNotificationsTable extends Migration
   {
     Schema::connection($this->connection)->dropIfExists('push_notifications');
   }
-}
+};
