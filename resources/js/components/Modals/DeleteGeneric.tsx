@@ -11,7 +11,8 @@ type props<T> = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (data: T) => void;
-  deleteRoute: string;
+  onAfterDelete?: () => void;
+  baseRoute: string;
   title: string;
   deleteParam: any;
   itemName: string;
@@ -22,14 +23,17 @@ export default function DeleteGeneric<T>({
   isOpen,
   onClose,
   onSuccess,
-  deleteRoute,
+  onAfterDelete,
+  baseRoute,
   title,
   deleteParam,
   itemName,
 }: props<T>) {
   const successDo = () => {
     onSuccess && onSuccess(data!);
+    onAfterDelete && onAfterDelete();
     onClose();
+
     notifications.show({
       title: 'Success!',
       message: `${title} permanently deleted successfully`,
@@ -38,10 +42,11 @@ export default function DeleteGeneric<T>({
 
   const mutation = useMutation<BaseAPIResponse>({
     mutationFn: async () => {
-      const res = await axios.delete(route(deleteRoute, deleteParam));
+      const res = await axios.delete(route(`${baseRoute}.destroy`, deleteParam));
       return res.data;
     },
     onSuccess: () => {
+      console.log(mutation);
       successDo();
     },
     onError: (error: Error | any) => {
@@ -49,7 +54,7 @@ export default function DeleteGeneric<T>({
       if (error.response?.status === 405) {
         successDo();
       } else {
-        console.error(error);
+        console.log(error);
         notifications.show({ title: 'Failed!', message: error.message });
       }
     },

@@ -257,3 +257,14 @@ export function readableEducationLevel(level: string) {
 export function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+export function formatRupiah(value: number) {
+  if (isNaN(value)) return 'Rp0';
+
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+}

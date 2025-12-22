@@ -1,26 +1,18 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Link } from '@inertiajs/react';
 import { Image } from '@mantine/core';
-import { IconBrandWhatsapp } from '@tabler/icons-react';
-import { Briefcase, ChevronDown, ChevronRight, Menu, Search, User, X } from 'lucide-react';
+import { BaggageClaim, FileChartColumn, Menu, X } from 'lucide-react';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdOutlinePermPhoneMsg } from 'react-icons/md';
 
 import LanguageSelector from './LanguageSelector';
 
 interface MobileNavProps {
   theme: any;
   currentPath: string;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  handleSearch: (e: any) => void;
-  handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  handleSearchIconClick: (e: React.MouseEvent<SVGSVGElement>) => void;
   navItems: Array<{
     label: string;
     href?: string;
@@ -31,16 +23,7 @@ interface MobileNavProps {
   }>;
 }
 
-export default function MobileNav({
-  theme,
-  currentPath,
-  searchQuery,
-  setSearchQuery,
-  handleSearch,
-  handleKeyPress,
-  handleSearchIconClick,
-  navItems,
-}: MobileNavProps) {
+export default function MobileNav({ theme, currentPath, navItems }: MobileNavProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
   const [openSubmenu, setOpenSubmenu] = React.useState<string | null>(null);
@@ -49,21 +32,6 @@ export default function MobileNav({
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);
-  };
-
-  const menuItems = [
-    { key: 'beranda', href: '/', icon: null },
-    ...navItems.map((item) => ({
-      key: item.label,
-      href: item.href || '#',
-      icon: item.children ? ChevronRight : null,
-      hasSubmenu: !!item.children,
-      children: item.children,
-    })),
-  ];
-
-  const handleSubmenuToggle = (itemKey: string) => {
-    setOpenSubmenu(openSubmenu === itemKey ? null : itemKey);
   };
 
   React.useEffect(() => {
@@ -75,7 +43,7 @@ export default function MobileNav({
   return (
     <>
       {/* Top Bar - Always visible */}
-      <div className="text-white px-4 py-2 relative" style={{ backgroundColor: theme.colors.blue[8] }}>
+      {/* <div className="text-white px-4 py-2 relative" style={{ backgroundColor: theme.colors.blue[8] }}>
         <div className="flex items-center justify-between text-sm">
           <a href="tel:02150829292" className="flex items-center space-x-1">
             <MdOutlinePermPhoneMsg className="w-4 h-4" />
@@ -86,12 +54,12 @@ export default function MobileNav({
             <span>WhatsApp</span>
           </a>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Mobile Header */}
       <div className="bg-white border-b shadow-sm px-4 relative">
         <div className="flex items-center justify-between">
-          <Link href={route('home.index')}>
+          <Link href={route('sale.index')}>
             <Image src={'/assets/media/logo-full.png'} alt="RSUI Logo" mah={65} w={110} className="cursor-pointer" />
           </Link>
 
@@ -108,38 +76,32 @@ export default function MobileNav({
 
             <SheetContent
               side="bottom"
-              className="w-full p-0 bg-gray-50 top-[100px] h-[calc(100vh-72px)] mobile-nav-sheet"
+              className="w-full p-0 bg-gray-50 top-[65px] h-[calc(100vh-72px)] mobile-nav-sheet"
               style={{ zIndex: 50 }}
             >
               {/* Mobile Menu Header */}
               <div className="bg-white p-4 border-b">
-                {/* <div className="flex items-center justify-between mt-8">
-                  <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="p-2">
-                    <X className="h-6 w-6" />
-                  </Button>
-                </div> */}
-
                 {/* Quick Access Cards */}
                 <div className="grid grid-cols-2 gap-3 mb-4 mt-0">
-                  <Link href={route('home.index')} className="bg-gray-50 rounded-lg p-3 text-center">
+                  <Link href={route('sale.index')} className="bg-gray-50 rounded-lg p-3 text-center">
                     <div className="w-8 h-8 mx-auto mb-2 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-blue-600" />
+                      <BaggageClaim className="w-4 h-4 text-blue-600" />
                     </div>
                     <div className="text-xs font-medium text-gray-700">
-                      <div>{t('pasien-pengunjung', t_opt)}</div>
+                      <div>Sales</div>
                     </div>
                   </Link>
 
-                  <Link href={route('about.index')} className="bg-gray-50 rounded-lg p-3 text-center">
+                  <Link href={route('report.index')} className="bg-gray-50 rounded-lg p-3 text-center">
                     <div className="w-8 h-8 mx-auto mb-2 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Briefcase className="w-4 h-4 text-blue-600" />
+                      <FileChartColumn className="w-4 h-4 text-blue-600" />
                     </div>
-                    <div className="text-xs font-medium text-gray-700">{t('profil-rsui', t_opt)}</div>
+                    <div className="text-xs font-medium text-gray-700">Laporan Bulanan</div>
                   </Link>
                 </div>
 
                 {/* Search Bar */}
-                <div className="relative">
+                {/* <div className="relative">
                   <Input
                     placeholder={t('pencarian', t_opt)}
                     value={searchQuery}
@@ -151,17 +113,17 @@ export default function MobileNav({
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
                     onClick={handleSearchIconClick}
                   />
-                </div>
+                </div> */}
               </div>
 
               {/* Menu Items */}
-              <div className="bg-white overflow-y-auto">
+              {/* <div className="bg-white overflow-y-auto">
                 {menuItems.map((item, index) => {
                   const isSubmenuOpen = openSubmenu === item.key;
                   return (
-                    <div key={item.key}>
-                      {/* @ts-ignore */}
-                      {item.hasSubmenu ? (
+                    <div key={item.key}> */}
+              {/* @ts-ignore */}
+              {/* {item.hasSubmenu ? (
                         <div>
                           <button
                             className="w-full px-4 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
@@ -182,15 +144,15 @@ export default function MobileNav({
                               isSubmenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                             }`}
                           >
-                            <div className="bg-gray-50 border-t border-gray-100">
-                              {/* @ts-ignore */}
-                              {item.children?.map((child, childIndex) => (
+                            <div className="bg-gray-50 border-t border-gray-100"> */}
+              {/* @ts-ignore */}
+              {/* {item.children?.map((child, childIndex) => (
                                 <Link key={child.label} href={child.href} onClick={() => setIsOpen(false)}>
                                   <button className="w-full px-8 py-3 text-left hover:bg-gray-100 transition-colors">
                                     <span className="text-gray-600 text-sm">{t(child.label, t_opt)}</span>
-                                  </button>
-                                  {/* @ts-ignore */}
-                                  {childIndex < (item.children?.length || 0) - 1 && (
+                                  </button> */}
+              {/* @ts-ignore */}
+              {/* {childIndex < (item.children?.length || 0) - 1 && (
                                     <div className="border-b border-gray-200 ml-8" />
                                   )}
                                 </Link>
@@ -217,7 +179,7 @@ export default function MobileNav({
                     </div>
                   );
                 })}
-              </div>
+              </div> */}
 
               {/* Bottom Section */}
               <div className="absolute bottom-4 left-4 right-4">

@@ -18,7 +18,6 @@ return new class extends Migration {
       $table->enum('payment_type', ['Cash', 'QRIS', 'Transfer']);
       $table->boolean('is_paid')->default(false);
       $table->boolean('extra_cup')->default(false);
-      $table->decimal('total_amount', 10, 2);
       $table->timestamps();
     });
   }

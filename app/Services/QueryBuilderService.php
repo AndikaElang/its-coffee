@@ -19,7 +19,7 @@ class QueryBuilderService
   {
     // Initialize search, per_page, query, and userId from the request
     $this->search = $request->query('search');
-    $this->per_page = $request->query('per_page', 15); // Default to 15 items per page
+    $this->per_page = $request->query('per_page');
     $this->query = $request->query();
     $this->userId = $request->user()?->id;
   }
@@ -89,7 +89,7 @@ class QueryBuilderService
         $searchFields = $options['searchFields'] ?? ["*"];
 
         foreach ($searchFields as $field) {
-          $query->orWhere($model->getTable() . '.' . $field, 'ILIKE', "%{$this->search}%");
+          $query->orWhere($model->getTable() . '.' . $field, 'LIKE', "%{$this->search}%");
         }
 
         // Search in all joined table fields
@@ -97,7 +97,7 @@ class QueryBuilderService
           foreach ($searchJoins as $join) {
             if (isset($join['searchFields'])) {
               foreach ($join['searchFields'] as $field) {
-                $query->orWhere($join['table'] . '.' . $field, 'ILIKE', "%{$this->search}%");
+                $query->orWhere($join['table'] . '.' . $field, 'LIKE', "%{$this->search}%");
               }
             }
           }
@@ -146,7 +146,7 @@ class QueryBuilderService
    */
   public function paginateQuery(QueryBuilder $queryBuilder, $per_page = 0): LengthAwarePaginator
   {
-    return $queryBuilder->paginate($per_page ?? $this->per_page)->appends($this->query);
+    return $queryBuilder->paginate($this->per_page ?? $per_page)->appends($this->query);
   }
 
   /**

@@ -14,6 +14,8 @@ return new class extends Migration {
       $table->id();
       $table->string('name');
       $table->decimal('base_price', 10, 2);
+      $table->decimal('it_price', 10, 2);
+      $table->decimal('deposit', 10, 2);
       $table->boolean('is_available')->default(true);
       $table->timestamps();
     });

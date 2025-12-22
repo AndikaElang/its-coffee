@@ -84,40 +84,40 @@ export function DeleteConfirmationModal<T>({
     <Dialog open={isOpen} onOpenChange={(open) => !isDeleting && !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-destructive">Delete {itemName}</DialogTitle>
+          <DialogTitle className="text-destructive">Hapus {itemName}</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the {itemName.toLowerCase()}.
+            Aksi ini tidak dapat dibatalkan. Ini akan menghapus secara permanen {itemName.toLowerCase()}.
           </DialogDescription>
         </DialogHeader>
 
         {status === 'success' ? (
           <div className="flex flex-col items-center justify-center py-4 space-y-2">
             <CheckCircle className="h-16 w-16 text-green-500" />
-            <p className="text-center font-medium">Successfully deleted!</p>
+            <p className="text-center font-medium">Berhasil dihapus!</p>
             <p className="text-center text-sm text-muted-foreground">{message}</p>
           </div>
         ) : status === 'error' ? (
           <div className="flex flex-col items-center justify-center py-4 space-y-2">
             <XCircle className="h-16 w-16 text-destructive" />
-            <p className="text-center font-medium">Error deleting item</p>
+            <p className="text-center font-medium">Gagal menghapus pesanan</p>
             <p className="text-center text-sm text-muted-foreground">{message}</p>
           </div>
         ) : (
           <>
             <div className="space-y-4 py-2">
               <div className="space-y-2">
-                <p className="text-sm">To confirm deletion, please type the following code:</p>
+                <p className="text-sm">Untuk mengonfirmasi penghapusan, silakan ketik kode berikut ini:</p>
                 <div className="bg-muted p-2 rounded-md text-center font-mono font-medium tracking-wider">
                   {confirmationCode}
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmation-input">Confirmation code</Label>
+                <Label htmlFor="confirmation-input">Kode konfirmas</Label>
                 <Input
                   id="confirmation-input"
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
-                  placeholder="Enter the code above"
+                  placeholder="Masukkan kode diatas"
                   className={message ? 'border-destructive' : ''}
                 />
                 {message && !isDeleting && <p className="text-xs text-destructive">{message}</p>}
@@ -125,7 +125,7 @@ export function DeleteConfirmationModal<T>({
             </div>
             <DialogFooter className="sm:justify-between">
               <Button type="button" className="cursor-pointer" variant="ghost" onClick={onClose} disabled={isDeleting}>
-                Cancel
+                Batal
               </Button>
               <Button
                 type="button"
@@ -137,7 +137,7 @@ export function DeleteConfirmationModal<T>({
                 {isDeleting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Deleting...
+                    Menghapus...
                   </>
                 ) : (
                   'Delete'
