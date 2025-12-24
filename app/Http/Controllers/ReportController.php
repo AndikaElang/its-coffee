@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GetOrderByDateRequest;
+use App\Models\Expense;
 use App\Models\Order;
 use App\Services\QueryBuilderService;
 use DB;
@@ -14,14 +15,16 @@ class ReportController extends Controller
 {
   protected $builderService;
   protected $dbOrder;
+  protected $dbExpense;
 
   public function __construct(QueryBuilderService $builderService)
   {
     $this->builderService = $builderService;
     $this->dbOrder = new Order();
+    $this->dbExpense = new Expense();
   }
 
-  public function index(Request $request, Order $order)
+  public function index(Request $request)
   {
     $startYear = $this->dbOrder->min(DB::raw('YEAR(created_at)')) ?? now()->year;
     $currentYear = now()->year;
@@ -36,7 +39,7 @@ class ReportController extends Controller
       $currentMonth = (int) $request->query('month');
     }
 
-    $options = [
+    $orderOpt = [
       'allowedSorts' => [
         'orders.id',
         'order_date',
@@ -64,8 +67,7 @@ class ReportController extends Controller
       ],
       'searchFields' => ['order_date', 'buyer_name']
     ];
-
-    $query = $this->builderService->buildQuery($order, $options)
+    $orderQ = $this->builderService->for('orders')->buildQuery(new Order(), $orderOpt)
       ->select(
         'orders.id',
         'menu_id',
@@ -86,14 +88,25 @@ class ReportController extends Controller
         now()->setYear($currentYear)->setMonth($currentMonth)->startOfMonth(),
         now()->setYear($currentYear)->setMonth($currentMonth)->endOfMonth()
       ]);
+    $orders = $this->builderService->paginateQuery($orderQ, 10);
 
-    // if no sort, default to updated_at
-    if (!$request->query('sort')) {
-      $query->orderBy('orders.created_at', 'desc');
-    }
+    $expenseOpt = [
+      'allowedSorts' => [
+        'id',
+        'type',
+        'amount',
+        'created_at',
+      ],
+      'searchFields' => ['type', 'description'] // Add the fields you want to search
+    ];
+    $expenseQ = $this->builderService->for('expenses')->buildQuery(new Expense(), $expenseOpt)
+      ->whereBetween('created_at', [
+        now()->setYear($currentYear)->setMonth($currentMonth)->startOfMonth(),
+        now()->setYear($currentYear)->setMonth($currentMonth)->endOfMonth()
+      ]);
+    $expenses = $this->builderService->paginateQuery($expenseQ, 10);
 
-    $orders = $this->builderService->paginateQuery($query, 10);
-    $profitThisMonth = $this->dbOrder
+    $grossProfitThisMonth = $this->dbOrder
       ->join('order_items', 'orders.id', '=', 'order_items.order_id')
       ->where('is_paid', true)
       ->whereBetween('order_date', [
@@ -101,7 +114,14 @@ class ReportController extends Controller
         now()->setYear($currentYear)->setMonth($currentMonth)->endOfMonth()
       ])
       ->sum('subtotal');
-    $ordersThisMonth = Order::with('items.menu')
+    $expenseThisMonth = $this->dbExpense
+      ->whereBetween('created_at', [
+        now()->setYear($currentYear)->setMonth($currentMonth)->startOfMonth(),
+        now()->setYear($currentYear)->setMonth($currentMonth)->endOfMonth()
+      ])
+      ->sum('amount');
+    $netProfitThisMonth = $grossProfitThisMonth - $expenseThisMonth;
+    $ordersThisMonth = $this->dbOrder->with('items.menu')
       ->whereMonth('created_at', $currentMonth)
       ->where('buyer_type', 'non-it')
       ->get();
@@ -110,14 +130,21 @@ class ReportController extends Controller
         return $item->menu->deposit * $item->qty;
       });
     });
+    $monthlyItDepositExpenseTotal = $this->dbExpense->whereMonth('created_at', $currentMonth)
+      ->where('type', 'bayar it')
+      ->sum('amount');
+    $monthlyDepositTotal -= $monthlyItDepositExpenseTotal;
 
     return Inertia::render('Report/index', [
       'data' => [
         'orders' => $orders,
+        'expenses' => $expenses,
         'years' => $years,
         'selectedYear' => $currentYear,
         'selectedMonth' => $currentMonth,
-        'profitThisMonth' => $profitThisMonth,
+        'grossProfitThisMonth' => $grossProfitThisMonth,
+        'expenseThisMonth' => $expenseThisMonth,
+        'netProfitThisMonth' => $netProfitThisMonth,
         'monthlydeposittotal' => $monthlyDepositTotal,
       ]
     ]);

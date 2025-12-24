@@ -93,7 +93,7 @@ class SaleController extends Controller
 
     $orders = $this->builderService->paginateQuery($query, 10);
     $menus = $this->dbMenu->where('is_available', true)->get();
-    $profitThisMonth = $this->dbOrder
+    $grossProfitThisMonth = $this->dbOrder
       ->join('order_items', 'orders.id', '=', 'order_items.order_id')
       ->where('is_paid', true)
       ->whereBetween('order_date', [
@@ -120,7 +120,7 @@ class SaleController extends Controller
       'data' => [
         'orders' => $orders,
         'menus' => $menus,
-        'profitThisMonth' => $profitThisMonth,
+        'grossProfitThisMonth' => $grossProfitThisMonth,
         'profitAllTime' => $profitAllTime,
         'monthlyDepositTotal' => $monthlyDepositTotal,
         'editOrder' => $editOrder,

@@ -5,7 +5,7 @@ import { useSearchFilter } from '@/hooks';
 import ContentLayout from '@/layouts/ContentLayout';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { cn, formatRupiah } from '@/lib/utils';
-import { Order, paginatedData } from '@/types/models';
+import { Expense, Order, paginatedData } from '@/types/models';
 import { GenericViewPage } from '@/types/page-params';
 import { router } from '@inertiajs/react';
 import {
@@ -17,6 +17,7 @@ import {
   Loader,
   Menu as MantineMenu,
   Tooltip as MantineTooltip,
+  NumberInput,
   Paper,
   Select,
   Text,
@@ -25,7 +26,7 @@ import {
 import { useDisclosure, useTimeout } from '@mantine/hooks';
 import { IconDotsVertical, IconEdit, IconFileExcel, IconSearch, IconTrash } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { EyeIcon } from 'lucide-react';
+import { EyeIcon, PlusIcon } from 'lucide-react';
 import { DataTable, DataTableProps, DataTableSortStatus } from 'mantine-datatable';
 import { useState } from 'react';
 import classes from '~/css/TableUtils.module.css';
@@ -35,29 +36,45 @@ const baseRoute = 'report';
 export default function Page(
   props: GenericViewPage<{
     orders: paginatedData<Order>;
+    expenses: paginatedData<Expense>;
     years: number[];
     selectedYear: number;
     selectedMonth: number;
-    profitThisMonth: number;
+    grossProfitThisMonth: number;
+    expenseThisMonth: number;
     monthlydeposittotal: number;
+    netProfitThisMonth: number;
   }>,
 ) {
   const data = props.data;
 
-  const [selected, setSelected] = useState<Order>();
+  const [selectedOrder, setSelectedOrder] = useState<Order>();
+  const [selectedExpense, setSelectedExpense] = useState<Expense>();
   const [isOpen, { open: onOpen, close: onClose }] = useDisclosure(false);
   const [selectedMonth, setSelectedMonth] = useState(data.selectedMonth);
   const [selectedYear, setSelectedYear] = useState(data.selectedYear);
-  const [selectedRecords, setSelectedRecords] = useState<Order[]>([]);
-  const searchFilter = useSearchFilter(`${baseRoute}.index`);
-  const [searching, setSearching] = useState(false);
-  const handleSearchingButton = () => {
-    setSearching((prev) => {
+  const [selectedOrderRecords, setSelectedOrderRecords] = useState<Order[]>([]);
+  const [selectedExpenseRecords, setSelectedExpenseRecords] = useState<Expense[]>([]);
+
+  // Orders search filter with context
+  const ordersSearchFilter = useSearchFilter(`${baseRoute}.index`, 'updated_at', 'orders');
+  const [ordersSearching, setOrdersSearching] = useState(false);
+
+  // Expenses search filter with context
+  const expensesSearchFilter = useSearchFilter(`${baseRoute}.index`, 'created_at', 'expenses');
+  const [expensesSearching, setExpensesSearching] = useState(false);
+
+  const handleOrdersSearchingButton = () => {
+    setOrdersSearching((prev) => {
+      return !prev;
+    });
+  };
+  const handleExpensesSearchingButton = () => {
+    setExpensesSearching((prev) => {
       return !prev;
     });
   };
   const [isOpenExportModal, { open: onOpenExportModal, close: onCloseExportModal }] = useDisclosure(false);
-  // const []
 
   const { start: openBatchExportDelay, clear: clearBatchExportDelay } = useTimeout(() => onOpenExportModal(), 150);
 
@@ -76,7 +93,19 @@ export default function Page(
     { value: '12', label: 'Desember' },
   ];
 
-  const columns: DataTableProps<Order>['columns'] = [
+  const expenseTypeSelection = [
+    { value: 'it_deposit', label: 'Bayar IT' },
+    { value: 'shopping', label: 'Belanja' },
+    { value: 'other', label: 'Lain-Lain' },
+  ];
+
+  const expenseTypeMapped: Record<string, string> = {
+    'bayar it': 'Bayar IT',
+    belanja: 'Belanja',
+    'lain-lain': 'Lain-Lain',
+  };
+
+  const orderColumns: DataTableProps<Order>['columns'] = [
     {
       accessor: 'order_date',
       title: 'Tanggal',
@@ -156,7 +185,76 @@ export default function Page(
               variant="filled"
               leftSection={<IconTrash size={16} />}
               onClick={() => {
-                setSelected(() => data);
+                setSelectedOrder(() => data);
+                onOpen();
+              }}
+            >
+              Hapus
+            </MantineMenu.Item>
+          </MantineMenu.Dropdown>
+        </MantineMenu>
+      ),
+    },
+  ];
+
+  const expenseColumns: DataTableProps<Expense>['columns'] = [
+    {
+      accessor: 'created_at',
+      title: 'Tanggal',
+      sortable: true,
+      render: (data: Expense) => <Text fz="sm">{dayjs(new Date(data.created_at!)).format('MMM D, YYYY')}</Text>,
+    },
+    {
+      accessor: 'type',
+      title: 'Jenis',
+      sortable: true,
+      render: (data: Expense) => <Text fz="sm">{expenseTypeMapped[data.type]}</Text>,
+    },
+    {
+      accessor: 'description',
+      title: 'Keterangan',
+    },
+    {
+      accessor: 'amount',
+      title: 'Nominal',
+      render: (data: Expense) => <Text fz="sm">{formatRupiah(Number(data.amount))}</Text>,
+      sortable: true,
+    },
+    {
+      accessor: 'id',
+      title: 'Aksi',
+      width: 150,
+      render: (data: Expense) => (
+        <MantineMenu withArrow width={150} shadow="md">
+          <MantineMenu.Target>
+            <ActionIcon>
+              <IconDotsVertical size={16} />
+            </ActionIcon>
+          </MantineMenu.Target>
+          <MantineMenu.Dropdown>
+            {/* <MantineMenu.Item
+              fw={600}
+              fz="sm"
+              color="blue"
+              variant="filled"
+              leftSection={<IconEdit size={16} />}
+              onClick={() => {
+                router.get(route('sale.index'), {
+                  edit: data.id,
+                });
+              }}
+            >
+              Edit
+            </MantineMenu.Item> */}
+
+            <MantineMenu.Item
+              fw={600}
+              fz="sm"
+              color="red"
+              variant="filled"
+              leftSection={<IconTrash size={16} />}
+              onClick={() => {
+                setSelectedExpense(() => data);
                 onOpen();
               }}
             >
@@ -175,20 +273,20 @@ export default function Page(
         onClose={() => {
           onCloseExportModal();
         }}
-        orders={selectedRecords}
+        orders={selectedOrderRecords}
       />
 
       <AppMeta title="Laporan Bulanan" />
       <PublicLayout {...props}>
         <ContentLayout title="IT'S COFFEE CORNER — LAPORAN BULANAN">
           <DeleteGeneric
-            data={selected}
+            data={selectedOrder}
             isOpen={isOpen}
             onClose={onClose}
             baseRoute={baseRoute}
             title="Pesanan"
-            deleteParam={{ id: selected?.id }}
-            itemName={`Pesanan ${selected?.name} atas nama ${selected?.buyer_name}`}
+            deleteParam={{ id: selectedOrder?.id }}
+            itemName={`Pesanan ${selectedOrder?.name} atas nama ${selectedOrder?.buyer_name}`}
             onSuccess={(deleted) => {
               data.orders.data = data.orders.data.filter((o) => o.id !== deleted.id);
             }}
@@ -199,59 +297,93 @@ export default function Page(
             }}
           />
 
+          <Group justify="space-between">
+            <Group gap="xs">
+              <Text>Bulan:</Text>
+              <Select
+                placeholder="Pilih Bulan"
+                data={monthSelection}
+                value={selectedMonth.toString()}
+                onChange={(e) => {
+                  setSelectedMonth(parseInt(e!));
+                }}
+              />
+              <Text>Tahun:</Text>
+              <Select
+                placeholder="Pilih Tahun"
+                data={data.years.map((year) => ({ value: year.toString(), label: year.toString() }))}
+                value={selectedYear.toString()}
+                onChange={(e) => {
+                  setSelectedYear(parseInt(e!));
+                }}
+              />
+              <Button
+                variant="filled"
+                rightSection={<EyeIcon />}
+                disabled={
+                  (selectedMonth === data.selectedMonth && selectedYear === data.selectedYear) ||
+                  ordersSearchFilter.isFetching ||
+                  expensesSearchFilter.isFetching
+                }
+                onClick={() => {
+                  router.get(
+                    route('report.index'),
+                    {
+                      month: selectedMonth,
+                      year: selectedYear,
+                    },
+                    {
+                      preserveState: true,
+                      replace: true,
+                    },
+                  );
+                }}
+              >
+                Tampilkan
+              </Button>
+            </Group>
+          </Group>
+
+          <Group gap="xs" mt="sm">
+            <Card shadow="md" mt="xs" radius="md">
+              <Text fw={500}>Total Pemasukan Kotor:</Text>
+              <Text size="sm" c="dimmed">
+                {formatRupiah(Number(data.grossProfitThisMonth))}
+              </Text>
+            </Card>
+            <Card shadow="md" mt="xs" radius="md">
+              <Text fw={500}>Total Pengeluaran:</Text>
+              <Text size="sm" c="dimmed">
+                {formatRupiah(Number(data.expenseThisMonth))}
+              </Text>
+            </Card>
+            <Card shadow="md" mt="xs" radius="md">
+              <Text fw={500}>Tagihan IT / Unit:</Text>
+              <Text size="sm" c="dimmed">
+                {formatRupiah(Number(data.monthlydeposittotal))}
+              </Text>
+            </Card>
+            <Card shadow="md" mt="xs" radius="md">
+              <Text fw={500}>Total Keuntungan Bersih:</Text>
+              <Text size="sm" c="dimmed">
+                {formatRupiah(Number(data.netProfitThisMonth))}
+              </Text>
+            </Card>
+          </Group>
+
+          {/* Orders Table */}
           <Paper p="md" shadow="md" radius="md" withBorder className="mt-4">
             <Group justify="space-between" mb="xl">
               <Group gap="xs">
-                <Text>Bulan:</Text>
-                <Select
-                  placeholder="Pilih Bulan"
-                  data={monthSelection}
-                  value={selectedMonth.toString()}
-                  onChange={(e) => {
-                    setSelectedMonth(parseInt(e!));
-                  }}
-                />
-                <Text>Tahun:</Text>
-                <Select
-                  placeholder="Pilih Tahun"
-                  data={data.years.map((year) => ({ value: year.toString(), label: year.toString() }))}
-                  value={selectedYear.toString()}
-                  onChange={(e) => {
-                    setSelectedYear(parseInt(e!));
-                  }}
-                />
-                <Button
-                  variant="filled"
-                  rightSection={<EyeIcon />}
-                  disabled={
-                    (selectedMonth === data.selectedMonth && selectedYear === data.selectedYear) ||
-                    searchFilter.isFetching
-                  }
-                  onClick={() => {
-                    router.get(
-                      route('report.index'),
-                      {
-                        month: selectedMonth,
-                        year: selectedYear,
-                      },
-                      {
-                        preserveState: true,
-                        replace: true,
-                      },
-                    );
-                  }}
-                >
-                  Tampilkan
-                </Button>
                 <Button
                   variant="outline"
                   rightSection={<IconFileExcel />}
                   color="lime"
-                  disabled={searchFilter.isFetching}
+                  disabled={ordersSearchFilter.isFetching}
                   onClick={() => {
                     clearBatchExportDelay();
-                    const temp = selectedRecords;
-                    setSelectedRecords(data.orders.data.filter((u) => temp.some((t) => t.id === u.id)));
+                    const temp = selectedOrderRecords;
+                    setSelectedOrderRecords(data.orders.data.filter((u) => temp.some((t) => t.id === u.id)));
                     openBatchExportDelay();
                   }}
                 >
@@ -262,14 +394,14 @@ export default function Page(
               <Group gap="xs">
                 <TextInput
                   placeholder="Cari..."
-                  leftSection={searchFilter.isFetching ? <Loader size={16} /> : <IconSearch size={16} />}
-                  value={searchFilter.search}
+                  leftSection={ordersSearchFilter.isFetching ? <Loader size={16} /> : <IconSearch size={16} />}
+                  value={ordersSearchFilter.search}
                   onChange={(e) => {
-                    searchFilter.onSearch(e.currentTarget.value);
+                    ordersSearchFilter.onSearch(e.currentTarget.value);
                   }}
                   className={cn(classes.searchInput, {
-                    [classes.appearAnimation]: searching,
-                    [classes.disappearAnimation]: !searching,
+                    [classes.appearAnimation]: ordersSearching,
+                    [classes.disappearAnimation]: !ordersSearching,
                   })}
                 />
 
@@ -277,8 +409,8 @@ export default function Page(
                   <ActionIcon
                     variant="outline"
                     size="lg"
-                    onClick={handleSearchingButton}
-                    loading={searchFilter.isFetching}
+                    onClick={handleOrdersSearchingButton}
+                    loading={ordersSearchFilter.isFetching}
                   >
                     <IconSearch />
                   </ActionIcon>
@@ -291,37 +423,84 @@ export default function Page(
               verticalSpacing="xs"
               striped
               highlightOnHover
-              columns={columns}
+              columns={orderColumns}
               records={data.orders.data}
-              selectedRecords={selectedRecords}
-              fetching={searchFilter.isFetching}
+              selectedRecords={selectedOrderRecords}
+              fetching={ordersSearchFilter.isFetching}
               totalRecords={data.orders.total}
               recordsPerPage={data.orders.per_page}
               page={data.orders.current_page}
               recordsPerPageOptions={[5, 10, 15, 20, 50]}
-              onSelectedRecordsChange={setSelectedRecords}
-              onPageChange={(page) => searchFilter.onPageChange(page)}
-              onRecordsPerPageChange={(perPage) => searchFilter.onRecordsPerPage(perPage)}
-              sortStatus={searchFilter.sortStatus as DataTableSortStatus<Order>}
+              onSelectedRecordsChange={setSelectedOrderRecords}
+              onPageChange={(page) => ordersSearchFilter.onPageChange(page)}
+              onRecordsPerPageChange={(perPage) => ordersSearchFilter.onRecordsPerPage(perPage)}
+              sortStatus={ordersSearchFilter.sortStatus as DataTableSortStatus<Order>}
               onSortStatusChange={(sortStatus: DataTableSortStatus<Order>) =>
-                searchFilter.onSortStatus(sortStatus as DataTableSortStatus<any>)
+                ordersSearchFilter.onSortStatus(sortStatus as DataTableSortStatus<any>)
               }
             />
+          </Paper>
 
-            <Group gap="xs" mt="sm">
-              <Card shadow="md" mt="xs" radius="md">
-                <Text fw={500}>Total Pemasukan:</Text>
-                <Text size="sm" c="dimmed">
-                  {formatRupiah(Number(data.profitThisMonth))}
-                </Text>
-              </Card>
-              <Card shadow="md" mt="xs" radius="md">
-                <Text fw={500}>Tagihan IT / Unit:</Text>
-                <Text size="sm" c="dimmed">
-                  {formatRupiah(Number(data.monthlydeposittotal))}
-                </Text>
-              </Card>
+          {/* Expenses Table */}
+          <Paper p="md" shadow="md" radius="md" withBorder className="mt-4">
+            <Group justify="space-between" mb="xl">
+              <Group gap="xs">
+                <Select placeholder="Jenis Pengeluaran" data={expenseTypeSelection} />
+                <TextInput placeholder="Keterangan Pengeluaran" />
+                <NumberInput placeholder="Nominal Pengeluaran" thousandSeparator=" " />
+                <Button variant="filled" rightSection={<PlusIcon />} color="green">
+                  Tambah
+                </Button>
+              </Group>
+
+              <Group gap="xs">
+                <TextInput
+                  placeholder="Cari..."
+                  leftSection={expensesSearchFilter.isFetching ? <Loader size={16} /> : <IconSearch size={16} />}
+                  value={expensesSearchFilter.search}
+                  onChange={(e) => {
+                    expensesSearchFilter.onSearch(e.currentTarget.value);
+                  }}
+                  className={cn(classes.searchInput, {
+                    [classes.appearAnimation]: expensesSearching,
+                    [classes.disappearAnimation]: !expensesSearching,
+                  })}
+                />
+
+                <MantineTooltip label="Cari" withArrow>
+                  <ActionIcon
+                    variant="outline"
+                    size="lg"
+                    onClick={handleExpensesSearchingButton}
+                    loading={expensesSearchFilter.isFetching}
+                  >
+                    <IconSearch />
+                  </ActionIcon>
+                </MantineTooltip>
+              </Group>
             </Group>
+
+            <DataTable
+              minHeight={200}
+              verticalSpacing="xs"
+              striped
+              highlightOnHover
+              columns={expenseColumns}
+              records={data.expenses.data}
+              selectedRecords={selectedExpenseRecords}
+              fetching={expensesSearchFilter.isFetching}
+              totalRecords={data.expenses.total}
+              recordsPerPage={data.expenses.per_page}
+              page={data.expenses.current_page}
+              recordsPerPageOptions={[5, 10, 15, 20, 50]}
+              onSelectedRecordsChange={setSelectedExpenseRecords}
+              onPageChange={(page) => expensesSearchFilter.onPageChange(page)}
+              onRecordsPerPageChange={(perPage) => expensesSearchFilter.onRecordsPerPage(perPage)}
+              sortStatus={expensesSearchFilter.sortStatus as DataTableSortStatus<Expense>}
+              onSortStatusChange={(sortStatus: DataTableSortStatus<Expense>) =>
+                expensesSearchFilter.onSortStatus(sortStatus as DataTableSortStatus<any>)
+              }
+            />
           </Paper>
         </ContentLayout>
       </PublicLayout>

@@ -16,7 +16,13 @@ type SearchFilerProps<T> = {
   onSortStatus: (e: DataTableSortStatus<T>) => void;
 };
 
-export default function useSearchFilter<T>(endpoint: string, defaultColumnSort = 'updated_at'): SearchFilerProps<T> {
+export default function useSearchFilter<T>(
+  endpoint: string,
+  defaultColumnSort = 'updated_at',
+  context?: string, // Add context parameter
+): SearchFilerProps<T> {
+  const prefix = context ? `${context}_` : ''; // Create prefix
+
   const [search, setSearch] = useState<string>('');
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<T>>({
@@ -29,30 +35,31 @@ export default function useSearchFilter<T>(endpoint: string, defaultColumnSort =
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
-    setSearch(queryParams.get('search') ?? '');
+    setSearch(queryParams.get(`${prefix}search`) ?? ''); // Use prefixed param
 
     // Set sort status based on query params
-    const sort = queryParams.get('sort');
+    const sort = queryParams.get(`${prefix}sort`); // Use prefixed param
     if (sort) {
       const direction = sort.startsWith('-') ? 'desc' : 'asc';
       const columnAccessor = sort.replace('-', '');
       setSortStatus({ columnAccessor, direction });
     } else {
       // default sort
-      setSortStatus({ columnAccessor: 'updated_at', direction: 'desc' });
+      setSortStatus({ columnAccessor: defaultColumnSort, direction: 'desc' });
     }
-  }, []);
+  }, [prefix]);
 
   const onQueryTable = (queryKey: string, queryValue: string | null) => {
     const queryParams = new URLSearchParams(window.location.search);
+    const prefixedKey = `${prefix}${queryKey}`; // Prefix the query key
 
-    if (queryValue === null) queryParams.delete(queryKey);
-    else queryParams.set(queryKey, queryValue.toString());
+    if (queryValue === null) queryParams.delete(prefixedKey);
+    else queryParams.set(prefixedKey, queryValue.toString());
 
-    if (queryKey === 'per_page') queryParams.set('page', '1');
+    if (queryKey === 'per_page') queryParams.set(`${prefix}page`, '1'); // Prefix page reset
 
     const payload = Object.fromEntries(queryParams);
-    router.get(route(endpoint), payload, { preserveState: true });
+    router.get(route(endpoint), payload, { preserveState: true, preserveScroll: true });
   };
 
   const onSortStatus = ({ columnAccessor, direction }: DataTableSortStatus<T>) => {

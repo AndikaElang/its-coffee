@@ -14,14 +14,29 @@ class QueryBuilderService
   protected $per_page;
   protected $query;
   protected $userId;
+  protected string $context = '';
+  protected Request $request;
 
   public function __construct(Request $request)
   {
-    // Initialize search, per_page, query, and userId from the request
-    $this->search = $request->query('search');
-    $this->per_page = $request->query('per_page');
+    $this->request = $request;
     $this->query = $request->query();
     $this->userId = $request->user()?->id;
+    // Don't initialize search and per_page here - wait for context to be set
+  }
+
+  public function for(string $context): self
+  {
+    $this->context = $context . '_';
+    // Initialize search and per_page AFTER context is set
+    $this->search = $this->param('search');
+    $this->per_page = $this->param('per_page');
+    return $this;
+  }
+
+  protected function param(string $key)
+  {
+    return $this->request->query($this->context . $key);
   }
 
   /**
@@ -146,7 +161,12 @@ class QueryBuilderService
    */
   public function paginateQuery(QueryBuilder $queryBuilder, $per_page = 0): LengthAwarePaginator
   {
-    return $queryBuilder->paginate($this->per_page ?? $per_page)->appends($this->query);
+    $pageName = $this->context ? $this->context . 'page' : 'page';
+
+    return $queryBuilder->paginate(
+      perPage: $this->per_page ?? $per_page,
+      pageName: $pageName
+    )->appends($this->query);
   }
 
   /**

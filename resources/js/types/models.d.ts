@@ -177,3 +177,12 @@ export interface OrderDetail {
   price: number;
   subtotal: number;
 }
+
+export type Expense = {
+  id: number;
+  type: string;
+  description: string;
+  amount: number;
+  created_at: string;
+  updated_at: string;
+};

@@ -52,7 +52,7 @@ export default function Page(
   props: GenericViewPage<{
     orders: paginatedData<Order>;
     menus: Menu[];
-    profitThisMonth: number;
+    grossProfitThisMonth: number;
     profitAllTime: number;
     monthlyDepositTotal: number;
     editOrder?: Order & {
@@ -634,7 +634,7 @@ export default function Page(
               <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center">
                 <span>
                   Pendapatan bulan ini:
-                  <Text fw={700}>{formatRupiah(Number(data.profitThisMonth))}</Text>
+                  <Text fw={700}>{formatRupiah(Number(data.grossProfitThisMonth))}</Text>
                 </span>
                 <span>
                   Pendapatan keseluruhan:
