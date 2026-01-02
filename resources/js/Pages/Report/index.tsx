@@ -1,10 +1,12 @@
 import AppMeta from '@/components/Meta/AppMeta';
+import { ConfirmAddModal } from '@/components/Modals/Confirm';
 import DeleteGeneric from '@/components/Modals/DeleteGeneric';
 import { ExportReportModal } from '@/components/Modals/exportModal';
 import { useSearchFilter } from '@/hooks';
+import useClientServerForm from '@/hooks/use-client-server-form';
 import ContentLayout from '@/layouts/ContentLayout';
 import { PublicLayout } from '@/layouts/PublicLayout';
-import { cn, formatRupiah } from '@/lib/utils';
+import { checkMantineForm, cn, formatRupiah, mapFormErrorsToMessage } from '@/lib/utils';
 import { Expense, Order, paginatedData } from '@/types/models';
 import { GenericViewPage } from '@/types/page-params';
 import { router } from '@inertiajs/react';
@@ -24,7 +26,16 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useDisclosure, useTimeout } from '@mantine/hooks';
-import { IconDotsVertical, IconEdit, IconFileExcel, IconSearch, IconTrash } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import {
+  IconCheck,
+  IconDotsVertical,
+  IconEdit,
+  IconFileExcel,
+  IconSearch,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { EyeIcon, PlusIcon } from 'lucide-react';
 import { DataTable, DataTableProps, DataTableSortStatus } from 'mantine-datatable';
@@ -44,13 +55,28 @@ export default function Page(
     expenseThisMonth: number;
     monthlydeposittotal: number;
     netProfitThisMonth: number;
+    netProfitAllTime: number;
   }>,
 ) {
   const data = props.data;
 
+  const initialValues = {
+    type: '',
+    description: '',
+    amount: '',
+  };
+  const { form, getSyncedInputProps, setFieldValueSync, inertiaForm, resetForm } = useClientServerForm({
+    initialValues,
+    validate: {},
+  });
+  const [responseNotifId, setResponseNotifId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<boolean>(false);
+
   const [selectedOrder, setSelectedOrder] = useState<Order>();
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
-  const [isOpen, { open: onOpen, close: onClose }] = useDisclosure(false);
+  const [isOpenOrder, { open: onOpenOrder, close: onCloseOrder }] = useDisclosure(false);
+  const [isOpenExpense, { open: onOpenExpense, close: onCloseExpense }] = useDisclosure(false);
+
   const [selectedMonth, setSelectedMonth] = useState(data.selectedMonth);
   const [selectedYear, setSelectedYear] = useState(data.selectedYear);
   const [selectedOrderRecords, setSelectedOrderRecords] = useState<Order[]>([]);
@@ -94,9 +120,9 @@ export default function Page(
   ];
 
   const expenseTypeSelection = [
-    { value: 'it_deposit', label: 'Bayar IT' },
-    { value: 'shopping', label: 'Belanja' },
-    { value: 'other', label: 'Lain-Lain' },
+    { value: 'bayar it', label: 'Bayar IT' },
+    { value: 'belanja', label: 'Belanja' },
+    { value: 'lain-lain', label: 'Lain-Lain' },
   ];
 
   const expenseTypeMapped: Record<string, string> = {
@@ -186,7 +212,7 @@ export default function Page(
               leftSection={<IconTrash size={16} />}
               onClick={() => {
                 setSelectedOrder(() => data);
-                onOpen();
+                onOpenOrder();
               }}
             >
               Hapus
@@ -232,20 +258,23 @@ export default function Page(
             </ActionIcon>
           </MantineMenu.Target>
           <MantineMenu.Dropdown>
-            {/* <MantineMenu.Item
+            <MantineMenu.Item
               fw={600}
               fz="sm"
               color="blue"
               variant="filled"
               leftSection={<IconEdit size={16} />}
               onClick={() => {
-                router.get(route('sale.index'), {
-                  edit: data.id,
-                });
+                setEditing(true);
+                setSelectedExpense(() => data);
+
+                setFieldValueSync('type', data.type);
+                setFieldValueSync('description', data.description);
+                setFieldValueSync('amount', data.amount / 1);
               }}
             >
               Edit
-            </MantineMenu.Item> */}
+            </MantineMenu.Item>
 
             <MantineMenu.Item
               fw={600}
@@ -255,7 +284,7 @@ export default function Page(
               leftSection={<IconTrash size={16} />}
               onClick={() => {
                 setSelectedExpense(() => data);
-                onOpen();
+                onOpenExpense();
               }}
             >
               Hapus
@@ -265,6 +294,102 @@ export default function Page(
       ),
     },
   ];
+
+  const resetData = () => {
+    resetForm();
+    setEditing(false);
+    setSelectedExpense(undefined);
+    setFieldValueSync('type', null);
+  };
+
+  const onSubmit = () => {
+    if (!checkMantineForm(form)) return;
+
+    const url = editing
+      ? route(`${baseRoute}.expense.update`, { id: selectedExpense!.id }) // update
+      : route(`${baseRoute}.expense.store`); // create
+
+    if (editing) {
+      inertiaForm.patch(url, {
+        onSuccess: (e) => {
+          let id;
+          if ((e.props.flash as any).error) {
+            id = notifications.show({
+              title: 'Gagal Update Pengeluaran',
+              message: (e.props.flash as any).error,
+              color: 'red',
+              autoClose: 10000,
+              icon: <IconX />,
+            });
+          } else {
+            id = notifications.show({
+              title: 'Berhasil Update Pengeluaran',
+              message: 'Data pengeluaran berhasil disimpan.',
+              color: 'green',
+              icon: <IconCheck />,
+            });
+          }
+          setResponseNotifId(id);
+        },
+        onError: (e) => {
+          const id = notifications.show({
+            title: 'Gagal Update Pengeluaran',
+            message: `Terjadi kesalahan, silahkan coba lagi. ${mapFormErrorsToMessage(e)}`,
+            color: 'red',
+            autoClose: 10000,
+            icon: <IconX />,
+          });
+          setResponseNotifId(id);
+        },
+        onFinish: () => {
+          resetData();
+        },
+      });
+    } else {
+      inertiaForm.post(url, {
+        onSuccess: (e) => {
+          let id;
+          if ((e.props.flash as any).error) {
+            id = notifications.show({
+              title: 'Gagal Menambahkan Pengeluaran',
+              message: (e.props.flash as any).error,
+              color: 'red',
+              autoClose: 10000,
+              icon: <IconX />,
+            });
+          } else {
+            id = notifications.show({
+              title: 'Berhasil Menambahkan Pengeluaran',
+              message: 'Data Pengeluaran berhasil disimpan.',
+              color: 'green',
+              icon: <IconCheck />,
+            });
+          }
+          setResponseNotifId(id);
+        },
+        onError: (e) => {
+          const id = notifications.show({
+            title: 'Gagal Menambahkan Pengeluaran',
+            message: `Terjadi kesalahan, silahkan coba lagi. ${mapFormErrorsToMessage(e)}`,
+            color: 'red',
+            autoClose: 10000,
+            icon: <IconX />,
+          });
+          setResponseNotifId(id);
+        },
+        onFinish: () => {
+          resetData();
+        },
+      });
+    }
+  };
+
+  const onSave = ConfirmAddModal({
+    onConfirm: () => {
+      onSubmit();
+    },
+    data: 'Form',
+  });
 
   return (
     <>
@@ -279,16 +404,36 @@ export default function Page(
       <AppMeta title="Laporan Bulanan" />
       <PublicLayout {...props}>
         <ContentLayout title="IT'S COFFEE CORNER — LAPORAN BULANAN">
+          {/* Delete Generic Order */}
           <DeleteGeneric
             data={selectedOrder}
-            isOpen={isOpen}
-            onClose={onClose}
+            isOpen={isOpenOrder}
+            onClose={onCloseOrder}
             baseRoute={baseRoute}
             title="Pesanan"
             deleteParam={{ id: selectedOrder?.id }}
             itemName={`Pesanan ${selectedOrder?.name} atas nama ${selectedOrder?.buyer_name}`}
             onSuccess={(deleted) => {
               data.orders.data = data.orders.data.filter((o) => o.id !== deleted.id);
+            }}
+            onAfterDelete={() => {
+              router.reload({
+                only: ['data'],
+              });
+            }}
+          />
+
+          {/* Delete Generic Expense */}
+          <DeleteGeneric
+            data={selectedExpense}
+            isOpen={isOpenExpense}
+            onClose={onCloseExpense}
+            baseRoute={`${baseRoute}.expense`}
+            title="Pengeluaran"
+            deleteParam={{ id: selectedExpense?.id }}
+            itemName={`Pengeluaran "${selectedExpense?.description}" pada tanggal ${dayjs(new Date(selectedExpense?.created_at!)).format('DD-MM-YYYY')}`}
+            onSuccess={(deleted) => {
+              data.expenses.data = data.expenses.data.filter((o) => o.id !== deleted.id);
             }}
             onAfterDelete={() => {
               router.reload({
@@ -326,14 +471,23 @@ export default function Page(
                   expensesSearchFilter.isFetching
                 }
                 onClick={() => {
+                  // Clear search states before navigating
+                  ordersSearchFilter.onSearch('');
+                  expensesSearchFilter.onSearch('');
+
                   router.get(
                     route('report.index'),
                     {
                       month: selectedMonth,
                       year: selectedYear,
+                      // Explicitly clear the search parameters
+                      orders_search: undefined,
+                      expenses_search: undefined,
+                      orders_page: 1,
+                      expenses_page: 1,
                     },
                     {
-                      preserveState: true,
+                      preserveState: false, // Changed from true to false
                       replace: true,
                     },
                   );
@@ -367,6 +521,12 @@ export default function Page(
               <Text fw={500}>Total Keuntungan Bersih:</Text>
               <Text size="sm" c="dimmed">
                 {formatRupiah(Number(data.netProfitThisMonth))}
+              </Text>
+            </Card>
+            <Card shadow="md" mt="xs" radius="md">
+              <Text fw={500}>Total Keseluruhan Keuntungan Bersih:</Text>
+              <Text size="sm" c="dimmed">
+                {formatRupiah(Number(data.netProfitAllTime))}
               </Text>
             </Card>
           </Group>
@@ -445,11 +605,43 @@ export default function Page(
           <Paper p="md" shadow="md" radius="md" withBorder className="mt-4">
             <Group justify="space-between" mb="xl">
               <Group gap="xs">
-                <Select placeholder="Jenis Pengeluaran" data={expenseTypeSelection} />
-                <TextInput placeholder="Keterangan Pengeluaran" />
-                <NumberInput placeholder="Nominal Pengeluaran" thousandSeparator=" " />
-                <Button variant="filled" rightSection={<PlusIcon />} color="green">
-                  Tambah
+                <Select
+                  placeholder="Jenis Pengeluaran"
+                  data={expenseTypeSelection}
+                  value={form.values.type}
+                  error={form.errors.type}
+                  disabled={inertiaForm.processing}
+                  onChange={(value) => {
+                    setFieldValueSync('type', value);
+                  }}
+                />
+                <TextInput
+                  placeholder="Keterangan Pengeluaran"
+                  value={form.values.description}
+                  error={form.errors.description}
+                  disabled={inertiaForm.processing}
+                  onChange={(e) => {
+                    setFieldValueSync('description', e.target.value);
+                  }}
+                />
+                <NumberInput
+                  placeholder="Nominal Pengeluaran"
+                  value={form.values.amount}
+                  error={form.errors.amount}
+                  disabled={inertiaForm.processing}
+                  onChange={(value) => {
+                    setFieldValueSync('amount', value);
+                  }}
+                  thousandSeparator=" "
+                />
+                <Button
+                  variant="filled"
+                  rightSection={<PlusIcon />}
+                  color="green"
+                  loading={inertiaForm.processing}
+                  onClick={onSave}
+                >
+                  {editing ? 'Update' : 'Tambah'}
                 </Button>
               </Group>
 

@@ -24,6 +24,9 @@ Route::group(['middleware' => ['web']], function () {
   Route::get('/report', [ReportController::class, 'index'])->name('report.index');
   Route::post('/report/export', [ReportController::class, 'getOrder'])->name('report.getOrder');
   Route::delete('/{order}/delete', [ReportController::class, 'destroy'])->name('report.destroy');
+  Route::post('/report/expense', [ReportController::class, 'storeExpense'])->name('report.expense.store');
+  Route::patch('/{expense}/expense/update', [ReportController::class, 'updateExpense'])->name('report.expense.update');
+  Route::delete('/{expense}/expense/delete', [ReportController::class, 'destroyExpense'])->name('report.expense.destroy');
 });
 
 require __DIR__ . '/auth.php';

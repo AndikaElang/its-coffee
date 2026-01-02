@@ -14,7 +14,7 @@ return new class extends Migration {
       $table->id();
       $table->enum('type', ['bayar it', 'belanja', 'lain-lain']);
       $table->string('description');
-      $table->integer('amount');
+      $table->decimal('amount', 15, 2);
       $table->timestamps();
     });
   }

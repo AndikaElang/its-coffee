@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GetOrderByDateRequest;
+use App\Http\Requests\StoreExpenseRequest;
 use App\Models\Expense;
 use App\Models\Order;
 use App\Services\QueryBuilderService;
 use DB;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,9 +28,10 @@ class ReportController extends Controller
 
   public function index(Request $request)
   {
-    $startYear = $this->dbOrder->min(DB::raw('YEAR(created_at)')) ?? now()->year;
+    $startYear = $this->dbOrder->min(DB::raw('YEAR(order_date)')) ?? now()->year;
+    $endYear = $this->dbOrder->max(DB::raw('YEAR(order_date)'));
     $currentYear = now()->year;
-    $years = range($startYear, $currentYear);
+    $years = range($startYear, $endYear);
     $currentMonth = now()->month;
 
     if ($request->query('year')) {
@@ -82,6 +85,7 @@ class ReportController extends Controller
         'subtotal',
         'is_paid',
       )
+      ->distinct()
       ->join('order_items', 'orders.id', '=', 'order_items.order_id')
       ->join('menus', 'menus.id', '=', 'order_items.menu_id')
       ->whereBetween('order_date', [
@@ -100,6 +104,7 @@ class ReportController extends Controller
       'searchFields' => ['type', 'description'] // Add the fields you want to search
     ];
     $expenseQ = $this->builderService->for('expenses')->buildQuery(new Expense(), $expenseOpt)
+      ->distinct()
       ->whereBetween('created_at', [
         now()->setYear($currentYear)->setMonth($currentMonth)->startOfMonth(),
         now()->setYear($currentYear)->setMonth($currentMonth)->endOfMonth()
@@ -122,7 +127,10 @@ class ReportController extends Controller
       ->sum('amount');
     $netProfitThisMonth = $grossProfitThisMonth - $expenseThisMonth;
     $ordersThisMonth = $this->dbOrder->with('items.menu')
-      ->whereMonth('created_at', $currentMonth)
+      ->whereBetween('order_date', [
+        now()->setYear($currentYear)->setMonth($currentMonth)->startOfMonth(),
+        now()->setYear($currentYear)->setMonth($currentMonth)->endOfMonth()
+      ])
       ->where('buyer_type', 'non-it')
       ->get();
     $monthlyDepositTotal = $ordersThisMonth->sum(function ($order) {
@@ -130,10 +138,21 @@ class ReportController extends Controller
         return $item->menu->deposit * $item->qty;
       });
     });
-    $monthlyItDepositExpenseTotal = $this->dbExpense->whereMonth('created_at', $currentMonth)
+    $monthlyItDepositExpenseTotal = $this->dbExpense
+      ->whereBetween('created_at', [
+        now()->setYear($currentYear)->setMonth($currentMonth)->startOfMonth(),
+        now()->setYear($currentYear)->setMonth($currentMonth)->endOfMonth()
+      ])
       ->where('type', 'bayar it')
       ->sum('amount');
     $monthlyDepositTotal -= $monthlyItDepositExpenseTotal;
+    $grossProfitAllTime = $this->dbOrder
+      ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+      ->where('is_paid', true)
+      ->sum('subtotal');
+    $expenseAllTime = $this->dbExpense
+      ->sum('amount');
+    $netProfitAllTime = $grossProfitAllTime - $expenseAllTime;
 
     return Inertia::render('Report/index', [
       'data' => [
@@ -146,6 +165,7 @@ class ReportController extends Controller
         'expenseThisMonth' => $expenseThisMonth,
         'netProfitThisMonth' => $netProfitThisMonth,
         'monthlydeposittotal' => $monthlyDepositTotal,
+        'netProfitAllTime' => $netProfitAllTime,
       ]
     ]);
   }
@@ -193,6 +213,43 @@ class ReportController extends Controller
     $order->delete();
     return response()->json([
       'message' => 'Order deleted successfully, BLE BLE BLE',
+      'success' => true,
+      'status' => 200,
+    ], 200);
+  }
+
+  public function storeExpense(StoreExpenseRequest $request, Expense $expense): RedirectResponse
+  {
+    $validated = $request->validated();
+
+    $expense->fill([
+      'type' => $validated['type'],
+      'description' => $validated['description'],
+      'amount' => $validated['amount'],
+    ]);
+    $expense->save();
+
+    return redirect()->back();
+  }
+
+  public function updateExpense(StoreExpenseRequest $request, Expense $expense): RedirectResponse
+  {
+    $validated = $request->validated();
+
+    $duar = $expense->update([
+      'type' => $validated['type'],
+      'description' => $validated['description'],
+      'amount' => $validated['amount'],
+    ]);
+
+    return redirect()->back();
+  }
+
+  public function destroyExpense(Expense $expense): JsonResponse
+  {
+    $expense->delete();
+    return response()->json([
+      'message' => 'Expense deleted successfully',
       'success' => true,
       'status' => 200,
     ], 200);
