@@ -60,7 +60,13 @@ export default function MobileNav({ theme, currentPath, navItems }: MobileNavPro
       <div className="bg-white border-b shadow-sm px-4 relative">
         <div className="flex items-center justify-between">
           <Link href={route('sale.index')}>
-            <Image src={'/assets/media/logo-full.png'} alt="RSUI Logo" mah={65} w={110} className="cursor-pointer" />
+            <Image
+              src={'/assets/media/logo-transparent.png'}
+              alt="RSUI Logo"
+              mah={65}
+              w={110}
+              className="cursor-pointer"
+            />
           </Link>
 
           <Sheet open={isOpen} onOpenChange={toggleOpen}>

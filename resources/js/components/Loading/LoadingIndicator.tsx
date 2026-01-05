@@ -1,4 +1,4 @@
-import LoadGif from '@/assets/media/load.gif';
+import Load from '@/assets/media/load.gif';
 import useProgressWhenRendering from '@/hooks/use-progress-when-rendering';
 import { Image, Stack, Text } from '@mantine/core';
 import React from 'react';
@@ -21,7 +21,7 @@ const LoadingIndicator: React.FC = () => {
       pos={'fixed'}
       style={{ zIndex: 9999, width: '100%', height: '100%' }}
     >
-      <Image className="centered-xy" src={LoadGif} alt="Loading" w={75} mb={'md'} />
+      <Image className="centered-xy" src={Load} alt="Loading" w={75} mb={'md'} />
 
       <Text fw={500} fs="italic" c={'dimmed'} className={classes.waviy}>
         {loadingText}

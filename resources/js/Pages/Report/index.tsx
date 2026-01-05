@@ -15,6 +15,7 @@ import {
   Badge,
   Button,
   Card,
+  Grid,
   Group,
   Loader,
   Menu as MantineMenu,
@@ -25,7 +26,7 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
-import { useDisclosure, useTimeout } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery, useTimeout } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
   IconCheck,
@@ -70,6 +71,7 @@ export default function Page(
     validate: {},
   });
   const [responseNotifId, setResponseNotifId] = useState<string | null>(null);
+  const isMobile = useMediaQuery('(max-width: 629px)');
   const [editing, setEditing] = useState<boolean>(false);
 
   const [selectedOrder, setSelectedOrder] = useState<Order>();
@@ -442,28 +444,42 @@ export default function Page(
             }}
           />
 
-          <Group justify="space-between">
-            <Group gap="xs">
-              <Text>Bulan:</Text>
+          <Grid gutter="sm" align="center">
+            {/* Bulan */}
+            <Grid.Col span={isMobile ? 2 : 'content'}>
+              <Text size="sm">Bulan:</Text>
+            </Grid.Col>
+
+            <Grid.Col span={isMobile ? 10 : 'content'}>
               <Select
-                placeholder="Pilih Bulan"
                 data={monthSelection}
                 value={selectedMonth.toString()}
-                onChange={(e) => {
-                  setSelectedMonth(parseInt(e!));
-                }}
+                onChange={(e) => setSelectedMonth(parseInt(e!))}
+                w={isMobile ? '100%' : 160}
               />
-              <Text>Tahun:</Text>
+            </Grid.Col>
+
+            {/* Tahun */}
+            <Grid.Col span={isMobile ? 2 : 'content'}>
+              <Text size="sm">Tahun:</Text>
+            </Grid.Col>
+
+            <Grid.Col span={isMobile ? 10 : 'content'}>
               <Select
-                placeholder="Pilih Tahun"
-                data={data.years.map((year) => ({ value: year.toString(), label: year.toString() }))}
+                data={data.years.map((year) => ({
+                  value: year.toString(),
+                  label: year.toString(),
+                }))}
                 value={selectedYear.toString()}
-                onChange={(e) => {
-                  setSelectedYear(parseInt(e!));
-                }}
+                onChange={(e) => setSelectedYear(parseInt(e!))}
+                w={isMobile ? '100%' : 120}
               />
+            </Grid.Col>
+
+            {/* Button */}
+            <Grid.Col span={isMobile ? 12 : 'content'}>
               <Button
-                variant="filled"
+                fullWidth
                 rightSection={<EyeIcon />}
                 disabled={
                   (selectedMonth === data.selectedMonth && selectedYear === data.selectedYear) ||
@@ -471,7 +487,6 @@ export default function Page(
                   expensesSearchFilter.isFetching
                 }
                 onClick={() => {
-                  // Clear search states before navigating
                   ordersSearchFilter.onSearch('');
                   expensesSearchFilter.onSearch('');
 
@@ -480,23 +495,20 @@ export default function Page(
                     {
                       month: selectedMonth,
                       year: selectedYear,
-                      // Explicitly clear the search parameters
                       orders_search: undefined,
                       expenses_search: undefined,
                       orders_page: 1,
                       expenses_page: 1,
                     },
-                    {
-                      preserveState: false, // Changed from true to false
-                      replace: true,
-                    },
+                    { preserveState: false, replace: true },
                   );
                 }}
+                w={isMobile ? '100%' : 164}
               >
                 Tampilkan
               </Button>
-            </Group>
-          </Group>
+            </Grid.Col>
+          </Grid>
 
           <Group gap="xs" mt="sm">
             <Card shadow="md" mt="xs" radius="md">
